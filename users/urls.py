@@ -1,12 +1,13 @@
 from rest_framework.routers import SimpleRouter
 
 from users.apps import UsersConfig
-from users.views import UserViewSet
+from users.views import UserViewSet, PaymentViewSet
 
 app_name = UsersConfig.name
 
 router = SimpleRouter()
-router.register(prefix="", viewset=UserViewSet, basename="course")
+router.register(prefix="users", viewset=UserViewSet, basename="users")
+router.register(prefix="payments", viewset=PaymentViewSet, basename="payments")
 
 urlpatterns = []
 

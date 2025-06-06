@@ -31,7 +31,7 @@ class Lesson(models.Model):
         null=True,
         verbose_name="Превью",
     )
-    video_url = models.URLField(verbose_name="Ссылка на видео")
+    video_url = models.URLField(blank=True, null=True, verbose_name="Ссылка на видео")
 
     class Meta:
         verbose_name = "Урок"

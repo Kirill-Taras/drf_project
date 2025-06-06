@@ -1,0 +1,47 @@
+[
+    {
+        "model": "materials.course",
+        "pk": 1,
+        "fields": {
+            "title": "Python для начинающих",
+            "preview": null,
+            "description": "Основы программирования на Python"
+        }
+    },
+    {
+        "model": "materials.course",
+        "pk": 2,
+        "fields": {
+            "title": "Django: веб-разработка",
+            "preview": null,
+            "description": "Создание веб-приложений на Django"
+        }
+    },
+    {
+        "model": "materials.course",
+        "pk": 3,
+        "fields": {
+            "title": "JavaScript и React",
+            "preview": null,
+            "description": "Frontend-разработка с React"
+        }
+    },
+    {
+        "model": "materials.course",
+        "pk": 4,
+        "fields": {
+            "title": "Базы данных SQL",
+            "preview": null,
+            "description": "Работа с PostgreSQL и MySQL"
+        }
+    },
+    {
+        "model": "materials.course",
+        "pk": 5,
+        "fields": {
+            "title": "Машинное обучение",
+            "preview": null,
+            "description": "Основы AI и нейросетей"
+        }
+    }
+]

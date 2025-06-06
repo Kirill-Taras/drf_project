@@ -1,0 +1,57 @@
+[
+    {
+        "model": "materials.lesson",
+        "pk": 1,
+        "fields": {
+            "course": 1,
+            "title": "Установка Python",
+            "description": "Как установить интерпретатор",
+            "preview": null,
+            "video_url": "https://example.com/lesson1"
+        }
+    },
+    {
+        "model": "materials.lesson",
+        "pk": 2,
+        "fields": {
+            "course": 1,
+            "title": "Основы синтаксиса",
+            "description": "Переменные и типы данных",
+            "preview": null,
+            "video_url": "https://example.com/lesson2"
+        }
+    },
+    {
+        "model": "materials.lesson",
+        "pk": 3,
+        "fields": {
+            "course": 2,
+            "title": "ORM в Django",
+            "description": "Работа с моделями",
+            "preview": null,
+            "video_url": "https://example.com/lesson3"
+        }
+    },
+    {
+        "model": "materials.lesson",
+        "pk": 4,
+        "fields": {
+            "course": 3,
+            "title": "Асинхронный JavaScript",
+            "description": "Promise и async/await",
+            "preview": null,
+            "video_url": "https://example.com/lesson4"
+        }
+    },
+    {
+        "model": "materials.lesson",
+        "pk": 5,
+        "fields": {
+            "course": 4,
+            "title": "Нормализация БД",
+            "description": "1NF, 2NF, 3NF",
+            "preview": null,
+            "video_url": "https://example.com/lesson5"
+        }
+    }
+]

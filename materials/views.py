@@ -9,7 +9,11 @@ from rest_framework.generics import (
 )
 
 from materials.models import Course, Lesson
-from materials.serializer import CourseSerializer, LessonSerializer, CourseDetailSerializer
+from materials.serializer import (
+    CourseSerializer,
+    LessonSerializer,
+    CourseDetailSerializer,
+)
 
 
 class CourseViewSet(ModelViewSet):

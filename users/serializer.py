@@ -4,7 +4,7 @@ from rest_framework.serializers import ModelSerializer, ValidationError, CharFie
 from users.models import Payment
 
 
-User= get_user_model()
+User = get_user_model()
 
 
 class UserSerializer(ModelSerializer):
@@ -54,10 +54,10 @@ class UserRegisterSerializer(ModelSerializer):
     def create(self, validated_data):
         validated_data.pop("password2")
         user = User.objects.create_user(
-            email=validated_data['email'],
-            password=validated_data['password'],
-            phone=validated_data.get('phone', ''),
-            city=validated_data.get('city', ''),
-            avatar=validated_data.get('avatar', None)
+            email=validated_data["email"],
+            password=validated_data["password"],
+            phone=validated_data.get("phone", ""),
+            city=validated_data.get("city", ""),
+            avatar=validated_data.get("avatar", None),
         )
         return user

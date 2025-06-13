@@ -41,6 +41,11 @@ class PaymentViewSet(ModelViewSet):
     filterset_class = PaymentFilter
     permission_classes = [IsAuthenticated]
 
+    def perform_create(self, serializer):
+        payment = serializer.save()
+        payment.user = self.request.user
+        payment.save()
+
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]

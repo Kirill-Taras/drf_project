@@ -1,0 +1,24 @@
+[
+    {
+        "model": "auth.group",
+        "pk": 1,
+        "fields": {
+            "name": "moders",
+            "permissions": [["change_course", "materials", "course"],
+                ["view_course", "materials", "course"],
+                ["change_lesson", "materials", "lesson"],
+                ["view_lesson", "materials", "lesson"]]
+        }
+    },
+    {
+        "model": "auth.group",
+        "pk": 3,
+        "fields": {
+            "name": "moders",
+            "permissions": [["change_course", "materials", "course"],
+                ["view_course", "materials", "course"],
+                ["change_lesson", "materials", "lesson"],
+                ["view_lesson", "materials", "lesson"]]
+        }
+    }
+]

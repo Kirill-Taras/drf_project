@@ -8,6 +8,7 @@ from rest_framework import status
 from users.filters import PaymentFilter
 
 from users.models import User, Payment
+from users.permissions import IsOwner
 from users.serializer import (
     UserRegisterSerializer,
     UserSerializer,
@@ -31,7 +32,17 @@ class UserViewSet(ModelViewSet):
     def get_permissions(self):
         if self.action == "create":
             return [AllowAny()]
+        elif self.action in ["retrieve", "update", "partial_update", "destroy"]:
+            return [IsAuthenticated(), IsOwner()]
         return super().get_permissions()
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_anonymous:
+            return User.objects.none()
+        if user.is_staff:
+            return User.objects.all()
+        return User.objects.filter(id=user.id)
 
 
 class PaymentViewSet(ModelViewSet):

@@ -71,9 +71,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "video_url",
-                    models.URLField(
-                        blank=True, null=True, verbose_name="Ссылка на видео"
-                    ),
+                    models.URLField(blank=True, null=True, verbose_name="Ссылка на видео"),
                 ),
                 (
                     "course",

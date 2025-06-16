@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import (
     CreateAPIView,
@@ -15,7 +15,7 @@ from materials.serializer import (
     LessonSerializer,
     CourseDetailSerializer,
 )
-from users.permissions import IsModer, IsOwner
+from users.permissions import IsModer, IsOwner, IsOwnerOrModer
 
 
 class CourseViewSet(ModelViewSet):
@@ -48,22 +48,27 @@ class CourseViewSet(ModelViewSet):
         serializer.save(owner=self.request.user)
 
 
-class LessonCreateAPIView(CreateAPIView):
-    queryset = Lesson.objects.all()
-    serializer_class = LessonSerializer
-    permission_classes = [IsAuthenticated]
-
-
-class LessonListAPIView(ListAPIView):
-    queryset = Lesson.objects.all()
-    serializer_class = LessonSerializer
-    permission_classes = [IsAuthenticated, (IsModer | IsOwner)]
-
+class BaseLessonView:
     def get_queryset(self):
         user = self.request.user
         if user.groups.filter(name="moders").exists():
             return Lesson.objects.all()
         return Lesson.objects.filter(owner=user)
+
+
+class LessonCreateAPIView(CreateAPIView, BaseLessonView):
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class LessonListAPIView(ListAPIView, BaseLessonView):
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class LessonUpdateAPIView(UpdateAPIView):
@@ -78,19 +83,13 @@ class LessonUpdateAPIView(UpdateAPIView):
         return Lesson.objects.filter(owner=user)
 
 
-class LessonRetrieveAPIView(RetrieveAPIView):
+class LessonRetrieveUpdateAPIView(RetrieveAPIView, UpdateAPIView, BaseLessonView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = [IsAuthenticated, (IsModer | IsOwner)]
-
-    def get_queryset(self):
-        user = self.request.user
-        if user.groups.filter(name="moders").exists():
-            return Lesson.objects.all()
-        return Lesson.objects.filter(owner=user)
+    permission_classes = [IsAuthenticated, IsOwnerOrModer]
 
 
-class LessonDestroyAPIView(DestroyAPIView):
+class LessonDestroyAPIView(DestroyAPIView, BaseLessonView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, IsOwner]

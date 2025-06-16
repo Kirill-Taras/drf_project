@@ -5,20 +5,20 @@ class IsModer(BasePermission):
     """Проверяет, является ли пользователь модератором"""
 
     def has_permission(self, request, view):
-        return (
-            request.user.is_authenticated
-            and request.user.groups.filter(name="moders").exists()
-        )
+        return request.user.is_authenticated and request.user.groups.filter(name="moders").exists()
 
 
 class IsOwner(BasePermission):
     """Проверяет, является ли пользователь владельцем объекта"""
 
+    def has_permission(self, request, view):
+        return request.user.is_authenticated
+
     def has_object_permission(self, request, view, obj):
         return obj.owner == request.user
 
 
-class IsOwnerOrReadOnly(BasePermission):
+class IsOwnerOrModer(BasePermission):
 
     def has_permission(self, request, view):
         return request.user.is_authenticated

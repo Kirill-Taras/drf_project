@@ -12,6 +12,7 @@ from rest_framework.generics import (
 )
 
 from materials.models import Course, Lesson, Subscription
+from materials.paginators import CoursePaginator, LessonPaginator
 from materials.serializer import (
     CourseSerializer,
     LessonSerializer,
@@ -23,6 +24,7 @@ from users.permissions import IsModer, IsOwner, IsOwnerOrModer
 class CourseViewSet(ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+    pagination_class = CoursePaginator
 
     def get_serializer_class(self):
         if self.action == "retrieve":
@@ -71,6 +73,7 @@ class LessonListAPIView(ListAPIView, BaseLessonView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = LessonPaginator
 
 
 class LessonUpdateAPIView(UpdateAPIView):

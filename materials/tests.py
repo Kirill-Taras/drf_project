@@ -116,7 +116,7 @@ class SubscriptionTests(APITestCase):
     def test_subscription_status_in_course(self):
         self.client.force_authenticate(user=self.user)
 
-        url = reverse('materials:course_detail', args=[self.course.id])
+        url = reverse('materials:course-detail', args=[self.course.id])
 
         response = self.client.get(url)
         self.assertIn('is_subscribed', response.data)

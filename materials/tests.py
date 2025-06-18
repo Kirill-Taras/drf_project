@@ -41,8 +41,8 @@ class LessonCRUDTests(APITestCase):
         """Тест прав доступа при создании урока"""
         test_cases = [
             (self.admin, status.HTTP_201_CREATED),
-            #(self.moderator, status.HTTP_403_FORBIDDEN),
-            #(self.user, status.HTTP_403_FORBIDDEN),
+            (self.moderator, status.HTTP_403_FORBIDDEN),
+            (self.user, status.HTTP_201_CREATED),
             (None, status.HTTP_401_UNAUTHORIZED)
         ]
 
@@ -86,7 +86,7 @@ class SubscriptionTests(APITestCase):
             email='user@test.com',
             password='testpass'
         )
-        self.course = Course.objects.create(title='Test Course')
+        self.course = Course.objects.create(title='Test Course', owner=self.user)
 
     def test_subscription_flow(self):
         """Тест полного цикла подписки/отписки"""

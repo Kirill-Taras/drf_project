@@ -1,3 +1,9 @@
 from django.contrib import admin
+from .models import Subscription
 
-# Register your models here.
+
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ('user', 'course', 'subscribed_at', 'is_active')
+    list_filter = ('is_active', 'course')
+    search_fields = ('user__email', 'course__title')

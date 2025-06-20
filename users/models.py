@@ -88,6 +88,10 @@ class Payment(models.Model):
     )
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Сумма оплаты")
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD_CHOICES, verbose_name="Способ оплаты")
+    stripe_product_id = models.CharField(max_length=100, blank=True)
+    stripe_price_id = models.CharField(max_length=100, blank=True)
+    stripe_session_id = models.CharField(max_length=100, blank=True)
+    payment_link = models.URLField(max_length=500, blank=True)
 
     def __str__(self):
         return f"{self.user.email} - {self.payment_date}"

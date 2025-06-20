@@ -27,8 +27,12 @@ class UserSerializer(ModelSerializer):
 class PaymentSerializer(ModelSerializer):
     class Meta:
         model = Payment
-        fields = "__all__"
-
+        fields = ('user',
+            'payment_date',
+            'stripe_product_id',
+            'stripe_price_id',
+            'stripe_session_id',
+            'payment_link')
 
 class UserDetailSerializer(ModelSerializer):
     payment = PaymentSerializer()

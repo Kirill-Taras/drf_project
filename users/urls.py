@@ -24,9 +24,9 @@ urlpatterns = [
     ),
     path("logout/", LogoutView.as_view(), name="logout"),
     path(
-        'payments/create/<int:course_id>/',
+        "payments/create/<int:course_id>/",
         CreatePaymentView.as_view(),
-        name='create-payment'
+        name="create-payment",
     ),
 ]
 

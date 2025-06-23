@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -16,6 +17,7 @@ from users.serializer import (
     UserSerializer,
     PaymentSerializer,
     UserDetailSerializer,
+    PaymentResponseSerializer,
 )
 from users.services import StripeService
 
@@ -77,42 +79,33 @@ class LogoutView(APIView):
 class CreatePaymentView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Создание платежной сессии для курса",
+        responses={201: PaymentResponseSerializer, 404: "Курс не найден"},
+    )
     def post(self, request, course_id):
-        try:
-            course = Course.objects.get(id=course_id)
+        course = Course.objects.get_object_or_404(id=course_id)
 
-            # Создаем продукт и цену в Stripe
-            product_id = StripeService.create_product(course.title)
-            price_id = StripeService.create_price(course.price, product_id)
+        # Создаем продукт и цену в Stripe
+        product_id = StripeService.create_product(course.title)
+        price_id = StripeService.create_price(course.price, product_id)
 
-            # Создаем сессию оплаты
-            session_data = StripeService.create_checkout_session(price_id)
+        # Создаем сессию оплаты
+        session_data = StripeService.create_checkout_session(price_id)
 
-            # Сохраняем платеж в БД
-            payment = Payment.objects.create(
-                user=request.user,
-                paid_course=course,
-                amount=course.price,
-                stripe_product_id=product_id,
-                stripe_price_id=price_id,
-                stripe_session_id=session_data['session_id'],
-                payment_link=session_data['payment_link'],
-                payment_method="transfer"
-            )
+        # Сохраняем платеж в БД
+        payment = Payment.objects.create(
+            user=request.user,
+            paid_course=course,
+            amount=course.price,
+            stripe_product_id=product_id,
+            stripe_price_id=price_id,
+            stripe_session_id=session_data["session_id"],
+            payment_link=session_data["payment_link"],
+            payment_method="transfer",
+        )
 
-            return Response({
-                'payment_id': payment.id,
-                'payment_link': payment.payment_link
-            }, status=status.HTTP_201_CREATED)
-
-        except Course.DoesNotExist:
-            return Response(
-                {'Ошибка': 'Course not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        except Exception as e:
-            return Response(
-                {'Ошибка': str(e)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
+        return Response(
+            {"payment_id": payment.id, "payment_link": payment.payment_link},
+            status=status.HTTP_201_CREATED,
+        )

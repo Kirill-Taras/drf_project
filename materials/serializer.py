@@ -7,10 +7,9 @@ from materials.validators import validate_youtube_url
 
 class LessonSerializer(serializers.ModelSerializer):
     """Сериализатор для вывода информации об уроках."""
+
     video_url = serializers.URLField(
-        validators=[validate_youtube_url],
-        required=False,
-        allow_blank=True
+        validators=[validate_youtube_url], required=False, allow_blank=True
     )
 
     class Meta:
@@ -30,12 +29,10 @@ class CourseSerializer(serializers.ModelSerializer):
         return obj.lessons.count()
 
     def get_is_subscribed(self, obj):
-        request = self.context.get('request')
+        request = self.context.get("request")
         if request and request.user.is_authenticated:
             return Subscription.objects.filter(
-                user=request.user,
-                course=obj,
-                is_active=True
+                user=request.user, course=obj, is_active=True
             ).exists()
         return False
 
@@ -53,11 +50,9 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         return obj.lessons.count()
 
     def get_is_subscribed(self, obj):
-        request = self.context.get('request')
+        request = self.context.get("request")
         if request and request.user.is_authenticated:
             return Subscription.objects.filter(
-                user=request.user,
-                course=obj,
-                is_active=True
+                user=request.user, course=obj, is_active=True
             ).exists()
         return False

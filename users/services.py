@@ -25,16 +25,15 @@ class StripeService:
     @staticmethod
     def create_checkout_session(price_id: str) -> dict:
         session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=[{
-                'price': price_id,
-                'quantity': 1,
-            }],
-            mode='payment',
+            payment_method_types=["card"],
+            line_items=[
+                {
+                    "price": price_id,
+                    "quantity": 1,
+                }
+            ],
+            mode="payment",
             success_url=PAYMENT_SUCCESS_URL,
             cancel_url=PAYMENT_CANCEL_URL,
         )
-        return {
-            'session_id': session.id,
-            'payment_link': session.url
-        }
+        return {"session_id": session.id, "payment_link": session.url}

@@ -8,7 +8,8 @@ from rest_framework.generics import (
     ListAPIView,
     UpdateAPIView,
     RetrieveAPIView,
-    DestroyAPIView, get_object_or_404,
+    DestroyAPIView,
+    get_object_or_404,
 )
 
 from materials.models import Course, Lesson, Subscription
@@ -53,7 +54,7 @@ class CourseViewSet(ModelViewSet):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context['request'] = self.request
+        context["request"] = self.request
         return context
 
 
@@ -107,11 +108,12 @@ class LessonDestroyAPIView(DestroyAPIView, BaseLessonView):
 
 class SubscriptionAPIView(APIView):
     """API для управления подписками на курсы"""
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        course_id = request.data.get('course_id')
+        course_id = request.data.get("course_id")
 
         course_item = get_object_or_404(Course, id=course_id)
         subs_item = Subscription.objects.filter(user=user, course=course_item)
@@ -119,19 +121,19 @@ class SubscriptionAPIView(APIView):
         if subs_item.exists():
             # Удаляем подписку если она существует
             subs_item.delete()
-            message = 'Подписка удалена'
+            message = "Подписка удалена"
             subscription_status = False
         else:
             # Создаем новую подписку
             Subscription.objects.create(user=user, course=course_item)
-            message = 'Подписка добавлена'
+            message = "Подписка добавлена"
             subscription_status = True
 
         return Response(
             {
                 "message": message,
                 "subscription_status": subscription_status,
-                "course": course_item.title
+                "course": course_item.title,
             },
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )

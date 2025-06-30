@@ -10,7 +10,9 @@ class PaymentFilter(django_filters.FilterSet):
     lesson = django_filters.ModelChoiceFilter(
         field_name="paid_lesson", queryset=Lesson.objects.all(), label="Фильтр по уроку"
     )
-    payment_method = django_filters.ChoiceFilter(choices=Payment.PAYMENT_METHOD_CHOICES, label="Способ оплаты")
+    payment_method = django_filters.ChoiceFilter(
+        choices=Payment.PAYMENT_METHOD_CHOICES, label="Способ оплаты"
+    )
     ordering = django_filters.OrderingFilter(
         fields=(
             ("payment_date", "date_asc"),

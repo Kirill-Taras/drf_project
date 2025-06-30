@@ -3,7 +3,7 @@ from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.urls import path
 from users.apps import UsersConfig
-from users.views import UserViewSet, PaymentViewSet, LogoutView
+from users.views import UserViewSet, PaymentViewSet, LogoutView, CreatePaymentView
 
 app_name = UsersConfig.name
 
@@ -23,6 +23,11 @@ urlpatterns = [
         name="token_refresh",
     ),
     path("logout/", LogoutView.as_view(), name="logout"),
+    path(
+        "payments/create/<int:course_id>/",
+        CreatePaymentView.as_view(),
+        name="create-payment",
+    ),
 ]
 
 urlpatterns += router.urls

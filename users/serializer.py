@@ -1,6 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from rest_framework.serializers import ModelSerializer, ValidationError, CharField
+from rest_framework.serializers import (
+    ModelSerializer,
+    ValidationError,
+    CharField,
+    URLField,
+    IntegerField,
+)
 from users.models import Payment
 
 
@@ -61,3 +67,8 @@ class UserRegisterSerializer(ModelSerializer):
             avatar=validated_data.get("avatar", None),
         )
         return user
+
+
+class PaymentResponseSerializer(ModelSerializer):
+    payment_id = IntegerField()
+    payment_link = URLField()

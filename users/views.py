@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -5,6 +6,8 @@ from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
+
+from materials.models import Course
 from users.filters import PaymentFilter
 
 from users.models import User, Payment
@@ -14,7 +17,9 @@ from users.serializer import (
     UserSerializer,
     PaymentSerializer,
     UserDetailSerializer,
+    PaymentResponseSerializer,
 )
+from users.services import StripeService
 
 
 class UserViewSet(ModelViewSet):
@@ -69,3 +74,38 @@ class LogoutView(APIView):
             return Response(status=status.HTTP_205_RESET_CONTENT)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class CreatePaymentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="Создание платежной сессии для курса",
+        responses={201: PaymentResponseSerializer, 404: "Курс не найден"},
+    )
+    def post(self, request, course_id):
+        course = Course.objects.get_object_or_404(id=course_id)
+
+        # Создаем продукт и цену в Stripe
+        product_id = StripeService.create_product(course.title)
+        price_id = StripeService.create_price(course.price, product_id)
+
+        # Создаем сессию оплаты
+        session_data = StripeService.create_checkout_session(price_id)
+
+        # Сохраняем платеж в БД
+        payment = Payment.objects.create(
+            user=request.user,
+            paid_course=course,
+            amount=course.price,
+            stripe_product_id=product_id,
+            stripe_price_id=price_id,
+            stripe_session_id=session_data["session_id"],
+            payment_link=session_data["payment_link"],
+            payment_method="transfer",
+        )
+
+        return Response(
+            {"payment_id": payment.id, "payment_link": payment.payment_link},
+            status=status.HTTP_201_CREATED,
+        )

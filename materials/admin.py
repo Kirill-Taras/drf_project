@@ -4,6 +4,6 @@ from .models import Subscription
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('user', 'course', 'subscribed_at', 'is_active')
-    list_filter = ('is_active', 'course')
-    search_fields = ('user__email', 'course__title')
+    list_display = ("user", "course", "subscribed_at", "is_active")
+    list_filter = ("is_active", "course")
+    search_fields = ("user__email", "course__title")

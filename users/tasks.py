@@ -1,17 +1,18 @@
 import logging
-from datetime import timezone, timedelta
+from datetime import timezone
 
-from celery import shared_task
+from dateutil.relativedelta import relativedelta
 
+from config.celery import app
 from users.models import User
 
 logger = logging.getLogger(__name__)
 
 
-@shared_task
-def deactivate_inactive_users():
+@app.task(ignore_result=True)
+def deactivate_inactive_users() -> None:
     """Задача для деактивации пользователей, не заходивших более месяца"""
-    inactive_threshold = timezone.now() - timedelta(days=30)
+    inactive_threshold = timezone.now() - relativedelta(months=1)
 
     inactive_users = User.objects.filter(
         last_login__lt=inactive_threshold,
@@ -21,4 +22,3 @@ def deactivate_inactive_users():
     count = inactive_users.update(is_active=False)
 
     logger.info(f"Deactivated {count} inactive users")
-    return f"Deactivated {count} inactive users"

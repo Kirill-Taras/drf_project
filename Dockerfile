@@ -1,4 +1,8 @@
-FROM python:3.11
+FROM python:3.13-slim
+
+# Переменные окружения
+ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE=drf_project.settings
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
@@ -15,10 +19,6 @@ RUN poetry config virtualenvs.create false && \
 
 # Копируем весь проект
 COPY . .
-
-# Переменные окружения
-ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE=drf_project.settings
 
 # Порт, который будет использовать контейнер
 EXPOSE 8000

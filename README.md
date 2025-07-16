@@ -9,12 +9,12 @@
 ## ⚙️ Основные параметры
 ```
 Технологии:
-- Python 3.11
-- Django 4.2
-- DRF 3.14
-- PostgreSQL 13
-- Redis 7
-- Celery 5.3
+- Python 
+- Django 
+- DRF 
+- PostgreSQL 
+- Redis 
+- Celery 
 
 Сервисы в Docker:
 - backend:8000   - Django приложение
@@ -27,9 +27,6 @@
 ## ⚙️ Команды для запуска
 Скопируйте шаблон .env файла
 ```cp .env.example .env```
-
-Заполните .env реальными значениями
-```nano .env```
 
 Сборка и запуск
 ```docker-compose up --build```

@@ -55,7 +55,6 @@ class User(AbstractUser):
         upload_to="users/avatars/", blank=True, null=True, verbose_name="Аватар"
     )
 
-
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 

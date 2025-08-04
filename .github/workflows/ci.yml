@@ -84,8 +84,9 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd ${{ secrets.DEPLOY_DIR }}
-          pip install poetry
-           ~/.local/bin/poetry install --no-dev
+          pip3 install --upgrade pip
+          python3 -m pip install poetry
+          poetry install --no-dev
         EOF
     - name: Apply migrations on server
       run: |

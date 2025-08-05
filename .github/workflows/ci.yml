@@ -79,12 +79,14 @@ jobs:
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
     - name: Copy project files to server
       run: |
-        rsync -avz --no-times --exclude '__pycache__' . ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}
+       ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+         cd ${{ secrets.DEPLOY_DIR }}
+         git pull
+       EOF
     - name: Install dependencies on server
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd ${{ secrets.DEPLOY_DIR }}
-          ls
           curl -sSL https://install.python-poetry.org | python3 -
           poetry install --no-dev
         EOF

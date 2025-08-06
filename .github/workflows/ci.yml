@@ -104,6 +104,9 @@ jobs:
         sudo systemctl restart postgresql
         sudo -u postgres psql -c "\du"
         EOF
+    - name: Check PostgreSQL status
+      run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "sudo systemctl status postgresql"
     - name: Apply migrations on server
       env:
         DB_NAME: ${{ secrets.DB_NAME }}
@@ -112,13 +115,6 @@ jobs:
         DB_HOST: localhost
         DB_PORT: 5432
       run: |
-        cat > .env <<EOL
-        DB_NAME=${{ secrets.DB_NAME }}
-        DB_USER=${{ secrets.DB_USER }}
-        DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-        DB_HOST=localhost
-        DB_PORT=5432
-        EOL
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd ${{ secrets.DEPLOY_DIR }}
           poetry run python manage.py migrate
@@ -127,6 +123,13 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd ${{ secrets.DEPLOY_DIR }}
+        cat > .env <<EOL
+        DB_NAME=${{ secrets.DB_NAME }}
+        DB_USER=${{ secrets.DB_USER }}
+        DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+        DB_HOST=localhost
+        DB_PORT=5432
+        EOL
           poetry run python manage.py collectstatic --noinput
         EOF
     - name: Restart application

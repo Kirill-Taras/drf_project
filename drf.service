@@ -1,0 +1,21 @@
+[Unit]
+Description=DRF API Service                      # Описание сервиса
+After=network.target postgresql.service          # Зависимости???
+
+[Service]
+User=admin                                      # Пользователь ВМ
+Group=drf_project                               # Группа (обычно www-data или ubuntu)
+WorkingDirectory=drf_project                    # Путь к проекту
+Environment="PATH=drf_project/.local/bin"       # Путь к виртуальному окружению
+
+# Команда запуска:
+ExecStart=drf_project/.local/bin/poetry run gunicorn \
+  --workers 3 \
+  --bind 0.0.0.0:8000 \
+  project.wsgi:application                      # Модуль WSGI
+
+Restart=always                                  # Автоперезапуск при сбоях
+RestartSec=5                                    # Пауза перед перезапуском
+
+[Install]
+WantedBy=multi-user.target                      # Автозапуск при загрузке системы

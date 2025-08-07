@@ -95,7 +95,7 @@ jobs:
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
         sudo systemctl stop postgresql || true
         sudo apt-get install -y postgresql postgresql-contrib
-        sudo pg_createcluster 14 main --start
+        sudo pg_createcluster 16 main --start
         sudo -u postgres psql -c "DROP USER IF EXISTS ${{ secrets.DB_USER }};"
         sudo -u postgres psql -c "CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';"
         sudo -u postgres psql -c "CREATE DATABASE ${{ secrets.DB_NAME }} OWNER ${{ secrets.DB_USER }};"

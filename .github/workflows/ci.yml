@@ -130,5 +130,6 @@ jobs:
     - name: Restart application
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          sudo python manage.py runserver
+          cd ${{ secrets.DEPLOY_DIR }}
+           poetry run python manage.py runserver
         EOF 

@@ -117,7 +117,7 @@ jobs:
           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
           DB_HOST=localhost
           DB_PORT=5432
-          EOL
+        EOL
           poetry run python manage.py migrate
         EOF
     - name: Collect static files on server
@@ -131,5 +131,5 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd ${{ secrets.DEPLOY_DIR }}
-           poetry run python manage.py runserver
+          poetry run python manage.py runserver
         EOF 

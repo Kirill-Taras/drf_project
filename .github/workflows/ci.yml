@@ -132,5 +132,6 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd ${{ secrets.DEPLOY_DIR }}
-          poetry run python manage.py runserver
+          pkill -f gunicorn || true  # Остановить предыдущий процесс
+          poetry run gunicorn drf_project.wsgi:application --bind 0.0.0.0:8000 --workers 4 --daemon
         EOF 

@@ -81,7 +81,8 @@ jobs:
       run: |
        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
          cd ${{ secrets.DEPLOY_DIR }}
-         git pull
+         git fetch --prune
+         git reset --hard origin/ci_cd
        EOF
     - name: Install dependencies on server
       run: |

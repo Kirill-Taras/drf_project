@@ -94,9 +94,6 @@ jobs:
     - name: Setup and configure PostgreSQL
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-        sudo systemctl stop postgresql || true
-        sudo pg_dropcluster 16 main --stop || true
-        sudo pg_createcluster 16 main --start
         sudo systemctl start postgresql@16-main
         sudo systemctl status postgresql@16-main
         sudo -u postgres psql -c "ALTER USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';" || \

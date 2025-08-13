@@ -129,3 +129,9 @@ jobs:
           mkdir -p static
           poetry run python manage.py collectstatic --noinput
         EOF
+
+    - name: Restart application
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          sudo systemctl restart myapp.service
+        EOF

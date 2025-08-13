@@ -91,20 +91,21 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
           poetry install --no-root
         EOF
-    - name: Setup PostgreSQL on server
+    - name: Setup and configure PostgreSQL
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
         sudo systemctl stop postgresql || true
-        sudo apt-get install -y postgresql postgresql-contrib
+        sudo pg_dropcluster 16 main --stop || true
         sudo pg_createcluster 16 main --start
-        sudo systemctl start postgresql@16-main
-        sudo -u postgres psql -c "DROP USER IF EXISTS ${{ secrets.DB_USER }};"
+        sudo systemctl status postgresql@16-main
+        sudo -u postgres psql -c "ALTER USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';" || \
         sudo -u postgres psql -c "CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';"
-        sudo -u postgres psql -c "CREATE DATABASE ${{ secrets.DB_NAME }} OWNER ${{ secrets.DB_USER }};"
+        sudo -u postgres psql -c "CREATE DATABASE ${{ secrets.DB_NAME }} OWNER ${{ secrets.DB_USER }};" || true
         sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${{ secrets.DB_NAME }} TO ${{ secrets.DB_USER }};"
-        echo "host all all 127.0.0.1/32 md5" | sudo tee -a /etc/postgresql/*/main/pg_hba.conf
-        sudo systemctl restart postgresql
+        echo "host all all 127.0.0.1/32 md5" | sudo tee -a /etc/postgresql/16/main/pg_hba.conf
+        sudo systemctl restart postgresql@16-main
         sudo -u postgres psql -c "\du"
+        sudo -u postgres psql -c "\l"
         EOF
     - name: Check PostgreSQL status
       run: |
@@ -121,11 +122,13 @@ jobs:
           DB_PORT=5432
           EOL
         EOF
-    - name: Apply migrations on server
+    - name: Apply migrations
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          cd ${{ secrets.DEPLOY_DIR }}
-          poetry run python manage.py migrate
+        cd ${{ secrets.DEPLOY_DIR }}
+        PGPASSWORD='${{ secrets.DB_PASSWORD }}' psql -h localhost -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }} -c "SELECT 1;" || exit 1
+        poetry run python manage.py migrate --no-input
+        poetry run python manage.py showmigrations
         EOF
     - name: Collect static files on server
       run: |
@@ -134,9 +137,8 @@ jobs:
           mkdir -p static
           poetry run python manage.py collectstatic --noinput
         EOF
-
     - name: Restart application
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          sudo systemctl restart myapp.service
+          gunicorn config.wsgi:application --bind 0.0.0.0:8000
         EOF

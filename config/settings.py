@@ -10,7 +10,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-SECRET_KEY = 'django-insecure-mq-mj&!_^8!+@8f(-=f6eym!vg9$$6(zc@03v5@o5%f*i6mmy_'
+SECRET_KEY = "django-insecure-mq-mj&!_^8!+@8f(-=f6eym!vg9$$6(zc@03v5@o5%f*i6mmy_"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

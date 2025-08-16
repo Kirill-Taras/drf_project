@@ -54,8 +54,6 @@ jobs:
         DB_PASSWORD: postgres
         DB_HOST: localhost
         DB_PORT: 5432
-        run: |
-          poetry run python manage.py migrate
       run: poetry run python manage.py migrate
     - name: Run tests
       env:
@@ -94,16 +92,19 @@ jobs:
     - name: Setup and configure PostgreSQL
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-        sudo systemctl start postgresql@16-main
-        sudo systemctl status postgresql@16-main
-        sudo -u postgres psql -c "ALTER USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';" || \
-        sudo -u postgres psql -c "CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';"
-        sudo -u postgres psql -c "CREATE DATABASE ${{ secrets.DB_NAME }} OWNER ${{ secrets.DB_USER }};" || true
-        sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${{ secrets.DB_NAME }} TO ${{ secrets.DB_USER }};"
-        echo "host all all 127.0.0.1/32 md5" | sudo tee -a /etc/postgresql/16/main/pg_hba.conf
-        sudo systemctl restart postgresql@16-main
-        sudo -u postgres psql -c "\du"
-        sudo -u postgres psql -c "\l"
+          sudo systemctl status postgresql || sudo systemctl start postgresql
+
+          sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname='${{ secrets.DB_USER }}'" | grep -q 1 || \
+            sudo -u postgres psql -c "CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';"
+
+          sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname='${{ secrets.DB_NAME }}'" | grep -q 1 || \
+            sudo -u postgres psql -c "CREATE DATABASE ${{ secrets.DB_NAME }} OWNER ${{ secrets.DB_USER }};"
+
+          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${{ secrets.DB_NAME }} TO ${{ secrets.DB_USER }};"
+
+          sudo -u postgres psql -c "\du"
+
+          sudo -u postgres psql -c "\l"
         EOF
     - name: Check PostgreSQL status
       run: |
@@ -116,7 +117,7 @@ jobs:
           DB_NAME=${{ secrets.DB_NAME }}
           DB_USER=${{ secrets.DB_USER }}
           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          DB_HOST=localhost
+          DB_HOST=postgres
           DB_PORT=5432
           EOL
         EOF
@@ -135,9 +136,9 @@ jobs:
           mkdir -p static
           poetry run python manage.py collectstatic --noinput
         EOF
-    - name: Restart application
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          cd ${{ secrets.DEPLOY_DIR }}
-          poetry run gunicorn config.wsgi:application --bind 0.0.0.0:8001
-        EOF
+#    - name: Restart application
+#      run: |
+#        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+#          cd ${{ secrets.DEPLOY_DIR }}
+#          poetry run gunicorn config.wsgi:application --bind 0.0.0.0:8000
+#        EOF

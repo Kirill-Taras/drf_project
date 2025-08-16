@@ -92,7 +92,13 @@ jobs:
     - name: Setup and configure PostgreSQL
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          sudo systemctl status postgresql || sudo systemctl start postgresql
+          if ! systemctl is-active --quiet postgresql@16-main; then
+            echo "PostgreSQL cluster is not running. Starting..."
+            sudo systemctl start postgresql@16-main
+          else
+            echo "PostgreSQL cluster is already running."
+          fi
+          sudo systemctl enable postgresql@16-main
 
           sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname='${{ secrets.DB_USER }}'" | grep -q 1 || \
             sudo -u postgres psql -c "CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';"
@@ -101,11 +107,6 @@ jobs:
             sudo -u postgres psql -c "CREATE DATABASE ${{ secrets.DB_NAME }} OWNER ${{ secrets.DB_USER }};"
 
           sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${{ secrets.DB_NAME }} TO ${{ secrets.DB_USER }};"
-
-          sudo -u postgres psql -c "\du"
-
-          sudo -u postgres psql -c "\l"
-        EOF
     - name: Check PostgreSQL status
       run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "sudo systemctl status postgresql@16-main"
@@ -117,7 +118,7 @@ jobs:
           DB_NAME=${{ secrets.DB_NAME }}
           DB_USER=${{ secrets.DB_USER }}
           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          DB_HOST=postgres
+          DB_HOST=localhost
           DB_PORT=5432
           EOL
         EOF

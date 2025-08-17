@@ -144,5 +144,6 @@ jobs:
           # Останавливаем старый процесс (если есть)
           pkill -f "gunicorn config.wsgi:application" || true
           # Запускаем новый процесс в фоне
-          nohup poetry run gunicorn config.wsgi:application --bind 0.0.0.0:8000 &
+          sudo systemctl restart drf_project.service
+          # nohup poetry run gunicorn config.wsgi:application --bind 0.0.0.0:8000 &
         EOF
